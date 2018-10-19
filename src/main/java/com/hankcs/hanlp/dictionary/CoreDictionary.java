@@ -77,7 +77,7 @@ public class CoreDictionary
                 CoreDictionary.Attribute attribute = new CoreDictionary.Attribute(natureCount);
                 for (int i = 0; i < natureCount; ++i)
                 {
-                    attribute.nature[i] = Enum.valueOf(Nature.class, param[1 + 2 * i]);
+                    attribute.nature[i] = Nature.create(param[1 + 2 * i]);
                     attribute.frequency[i] = Integer.parseInt(param[2 + 2 * i]);
                     attribute.totalFrequency += attribute.frequency[i];
                 }
@@ -269,11 +269,15 @@ public class CoreDictionary
             try
             {
                 String param[] = natureWithFrequency.split(" ");
+                if (param.length % 2 != 0)
+                {
+                    return new Attribute(Nature.create(natureWithFrequency.trim()), 1); // 儿童锁
+                }
                 int natureCount = param.length / 2;
                 Attribute attribute = new Attribute(natureCount);
                 for (int i = 0; i < natureCount; ++i)
                 {
-                    attribute.nature[i] = LexiconUtility.convertStringToNature(param[2 * i], null);
+                    attribute.nature[i] = Nature.create(param[2 * i]);
                     attribute.frequency[i] = Integer.parseInt(param[1 + 2 * i]);
                     attribute.totalFrequency += attribute.frequency[i];
                 }
@@ -318,7 +322,7 @@ public class CoreDictionary
         {
             try
             {
-                Nature pos = Enum.valueOf(Nature.class, nature);
+                Nature pos = Nature.create(nature);
                 return getNatureFrequency(pos);
             }
             catch (IllegalArgumentException e)
