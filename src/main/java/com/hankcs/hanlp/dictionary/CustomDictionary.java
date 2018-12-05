@@ -71,12 +71,14 @@ public class CustomDictionary
             for (String p : path)
             {
                 Nature defaultNature = Nature.n;
-                int cut = p.indexOf(' ');
+                File file = new File(p);
+                String fileName = file.getName();
+                int cut = fileName.lastIndexOf(' ');
                 if (cut > 0)
                 {
                     // 有默认词性
-                    String nature = p.substring(cut + 1);
-                    p = p.substring(0, cut);
+                    String nature = fileName.substring(cut + 1);
+                    p = file.getParent() + File.separator + fileName.substring(0, cut);
                     try
                     {
                         defaultNature = LexiconUtility.convertStringToNature(nature, customNatureCollector);
@@ -106,8 +108,15 @@ public class CustomDictionary
             {
                 attributeList.add(entry.getValue());
             }
-            DataOutputStream out = new DataOutputStream(IOUtil.newOutputStream(mainPath + Predefine.BIN_EXT));
+            DataOutputStream out = new DataOutputStream(new BufferedOutputStream(IOUtil.newOutputStream(mainPath + Predefine.BIN_EXT)));
             // 缓存用户词性
+            if (customNatureCollector.isEmpty()) // 热更新
+            {
+                for (int i = Nature.begin.ordinal() + 1; i < Nature.values().length; ++i)
+                {
+                    customNatureCollector.add(Nature.values()[i]);
+                }
+            }
             IOUtil.writeCustomNature(out, customNatureCollector);
             // 缓存正文
             out.writeInt(attributeList.size());
